@@ -1,0 +1,96 @@
+const express = require("express");
+const cors = require("cors");
+const helmet = require("helmet");
+const morgan = require("morgan");
+const rateLimit = require("express-rate-limit");
+const path = require("path");
+const fs = require("fs");
+
+const connectDB = require("./config/db");
+const { PORT, CORS_ORIGIN, UPLOAD_DIR } = require("./config/env");
+
+// Route imports
+const authRoutes = require("./routes/auth.routes");
+const adminRoutes = require("./routes/admin.routes");
+const analysisRoutes = require("./routes/analysis.routes");
+const reportRoutes = require("./routes/report.routes");
+
+const app = express();
+
+// ---- Security Middleware ----
+app.use(helmet());
+const allowedOrigins = CORS_ORIGIN.split(',').map(o => o.trim());
+app.use(cors({
+    origin: (origin, cb) => {
+        if (!origin || allowedOrigins.includes(origin)) cb(null, true);
+        else cb(new Error('CORS not allowed'));
+    },
+    credentials: true,
+}));
+app.use(express.json({ limit: "5mb" }));
+app.use(express.urlencoded({ extended: true }));
+app.use(morgan("combined"));
+
+// Rate limiting
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100,
+    message: { error: "Too many requests, please try again later" },
+});
+app.use("/api/", limiter);
+
+// Stricter rate limit for auth endpoints
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 20,
+    message: { error: "Too many authentication attempts" },
+});
+app.use("/api/auth/login", authLimiter);
+app.use("/api/auth/register", authLimiter);
+
+// ---- Ensure upload directories exist ----
+const uploadDirs = [
+    path.join(UPLOAD_DIR, "identity_docs"),
+    path.join(UPLOAD_DIR, "logs"),
+];
+uploadDirs.forEach((dir) => {
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
+});
+
+// ---- API Routes ----
+app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/analysis", analysisRoutes);
+app.use("/api/reports", reportRoutes);
+
+// Health check
+app.get("/api/health", (req, res) => {
+    res.json({ status: "ok", timestamp: new Date().toISOString(), service: "SOC AI Assistant API" });
+});
+
+// 404 handler
+app.use((req, res) => {
+    res.status(404).json({ error: "Route not found" });
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error("[Error]", err.stack);
+    res.status(500).json({ error: "Internal server error" });
+});
+
+// ---- Start Server ----
+const startServer = async () => {
+    await connectDB();
+    app.listen(PORT, () => {
+        console.log(`\n🛡️  SOC AI Assistant API running on port ${PORT}`);
+        console.log(`📄  Health check: http://localhost:${PORT}/api/health`);
+        console.log(`🔐  Environment: ${process.env.NODE_ENV || "development"}\n`);
+    });
+};
+
+startServer();
+
+module.exports = app;
