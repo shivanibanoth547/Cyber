@@ -1,26 +1,27 @@
 const dotenv = require("dotenv");
 dotenv.config();
 
+// Helper: trim env vars to remove PowerShell newline artifacts
+const env = (key, fallback = "") => (process.env[key] || fallback).trim();
+
 module.exports = {
-  PORT: process.env.PORT || 5000,
-  NODE_ENV: process.env.NODE_ENV || "development",
-  MONGODB_URI:
-    process.env.MONGODB_URI || "mongodb://localhost:27017/soc_ai_assistant",
+  PORT: parseInt(env("PORT", "5000"), 10),
+  NODE_ENV: env("NODE_ENV", "development"),
+  MONGODB_URI: env("MONGODB_URI", "mongodb://localhost:27017/soc_ai_assistant"),
 
-  JWT_SECRET: process.env.JWT_SECRET || "fallback_secret_not_for_production",
-  JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || "8h",
-  JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN || "7d",
+  JWT_SECRET: env("JWT_SECRET", "fallback_secret_not_for_production"),
+  JWT_EXPIRES_IN: env("JWT_EXPIRES_IN", "8h"),
+  JWT_REFRESH_EXPIRES_IN: env("JWT_REFRESH_EXPIRES_IN", "7d"),
 
-  HUGGINGFACE_API_TOKEN: process.env.HUGGINGFACE_API_TOKEN || "",
-  HUGGINGFACE_MODEL:
-    process.env.HUGGINGFACE_MODEL || "meta-llama/Llama-2-13b-chat-hf",
+  HUGGINGFACE_API_TOKEN: env("HUGGINGFACE_API_TOKEN"),
+  HUGGINGFACE_MODEL: env("HUGGINGFACE_MODEL", "meta-llama/Llama-2-13b-chat-hf"),
 
-  MAX_FILE_SIZE_MB: parseInt(process.env.MAX_FILE_SIZE_MB, 10) || 10,
-  UPLOAD_DIR: process.env.UPLOAD_DIR || "./uploads",
+  MAX_FILE_SIZE_MB: parseInt(env("MAX_FILE_SIZE_MB", "10"), 10),
+  UPLOAD_DIR: env("UPLOAD_DIR", "./uploads"),
 
-  MAX_LOGIN_ATTEMPTS: parseInt(process.env.MAX_LOGIN_ATTEMPTS, 10) || 5,
-  LOCK_DURATION_MINUTES:
-    parseInt(process.env.LOCK_DURATION_MINUTES, 10) || 30,
+  MAX_LOGIN_ATTEMPTS: parseInt(env("MAX_LOGIN_ATTEMPTS", "5"), 10),
+  LOCK_DURATION_MINUTES: parseInt(env("LOCK_DURATION_MINUTES", "30"), 10),
 
-  CORS_ORIGIN: process.env.CORS_ORIGIN || "http://localhost:5173",
+  CORS_ORIGIN: env("CORS_ORIGIN", "http://localhost:5173"),
 };
+
