@@ -1,5 +1,4 @@
 const crypto = require("crypto");
-const fs = require("fs");
 
 /**
  * Compute SHA-256 hash of a string.
@@ -9,16 +8,10 @@ function hashString(input) {
 }
 
 /**
- * Compute SHA-256 hash of a file by its path.
+ * Compute SHA-256 hash of a Buffer.
  */
-function hashFile(filePath) {
-    return new Promise((resolve, reject) => {
-        const hash = crypto.createHash("sha256");
-        const stream = fs.createReadStream(filePath);
-        stream.on("data", (chunk) => hash.update(chunk));
-        stream.on("end", () => resolve(hash.digest("hex")));
-        stream.on("error", reject);
-    });
+function hashBuffer(buffer) {
+    return crypto.createHash("sha256").update(buffer).digest("hex");
 }
 
-module.exports = { hashString, hashFile };
+module.exports = { hashString, hashBuffer };

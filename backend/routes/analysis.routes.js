@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const fs = require("fs");
 const { authenticate } = require("../middleware/auth.middleware");
 const { authorize } = require("../middleware/rbac.middleware");
 const { uploadLogFile } = require("../middleware/upload.middleware");
@@ -25,8 +24,8 @@ router.post("/upload-log", (req, res) => {
             let originalFilename = null;
 
             if (req.file) {
-                // Read uploaded file content
-                logText = fs.readFileSync(req.file.path, "utf-8");
+                // Read file content from memory buffer
+                logText = req.file.buffer.toString("utf-8");
                 originalFilename = req.file.originalname;
             } else if (req.body.logText) {
                 // Direct text input

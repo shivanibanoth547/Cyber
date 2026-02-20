@@ -11,14 +11,6 @@ const IdentityDocumentSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        storedName: {
-            type: String,
-            required: true,
-        },
-        filePath: {
-            type: String,
-            required: true,
-        },
         mimeType: {
             type: String,
             required: true,
@@ -29,6 +21,11 @@ const IdentityDocumentSchema = new mongoose.Schema(
             required: true,
         },
         sha256Hash: {
+            type: String,
+            required: true,
+        },
+        // File stored as Base64 in MongoDB (works on serverless platforms)
+        fileData: {
             type: String,
             required: true,
         },

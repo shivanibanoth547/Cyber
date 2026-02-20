@@ -4,7 +4,7 @@ const { registerUser, loginUser } = require("../services/auth.service");
 const { authenticate } = require("../middleware/auth.middleware");
 const { uploadIdentityDoc } = require("../middleware/upload.middleware");
 const IdentityDocument = require("../models/IdentityDocument");
-const { hashFile } = require("../utils/hash");
+const { hashBuffer } = require("../utils/hash");
 const { isValidEmail, isStrongPassword } = require("../utils/validators");
 const { createAuditEntry } = require("../middleware/audit.middleware");
 
@@ -38,17 +38,18 @@ router.post("/register", (req, res) => {
             // Register user
             const userData = await registerUser({ email, password, fullName });
 
-            // Save identity document if uploaded
+            // Save identity document if uploaded (stored as Base64 in MongoDB)
             if (req.file) {
-                const sha256Hash = await hashFile(req.file.path);
+                const sha256Hash = hashBuffer(req.file.buffer);
+                const fileData = req.file.buffer.toString("base64");
+
                 await IdentityDocument.create({
                     userId: userData.id,
                     originalName: req.file.originalname,
-                    storedName: req.file.filename,
-                    filePath: req.file.path,
                     mimeType: req.file.mimetype,
                     fileSize: req.file.size,
                     sha256Hash,
+                    fileData,
                 });
             }
 
