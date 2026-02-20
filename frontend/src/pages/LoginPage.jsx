@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Shield, LogIn } from 'lucide-react';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -27,7 +28,12 @@ export default function LoginPage() {
     return (
         <div className="auth-container">
             <div className="auth-card">
-                <h1>🛡️ SOC AI Assistant</h1>
+                <div className="auth-logo">
+                    <div className="logo-icon">
+                        <Shield size={28} color="#fff" />
+                    </div>
+                </div>
+                <h1>SOC AI Assistant</h1>
                 <p className="subtitle">Internal Security Operations Center</p>
 
                 {error && <div className="alert alert-error">{error}</div>}
@@ -56,7 +62,11 @@ export default function LoginPage() {
                         />
                     </div>
                     <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
-                        {loading ? 'Authenticating...' : '🔐 Sign In'}
+                        {loading ? (
+                            <>Authenticating...</>
+                        ) : (
+                            <><LogIn size={16} /> Sign In</>
+                        )}
                     </button>
                 </form>
 

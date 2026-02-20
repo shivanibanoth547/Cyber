@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
+import { ShimmerTable } from '../components/ShimmerLoader';
+import { FileText, Eye, X } from 'lucide-react';
 import api from '../services/api';
 
 export default function ReportsPage() {
@@ -36,14 +38,18 @@ export default function ReportsPage() {
         <div className="app-layout">
             <Sidebar />
             <main className="main-content">
-                <div className="navbar"><h1>📝 Incident Reports</h1></div>
+                <div className="navbar">
+                    <h1><FileText size={24} className="page-header-icon" /> Incident Reports</h1>
+                </div>
 
                 {/* Report Viewer */}
                 {selected && (
                     <div className="card" style={{ marginBottom: 24, borderColor: 'var(--accent-purple)' }}>
                         <div className="card-header">
                             <h3>{selected.reportTitle}</h3>
-                            <button className="btn btn-secondary btn-sm" onClick={() => setSelected(null)}>✕ Close</button>
+                            <button className="btn btn-secondary btn-sm" onClick={() => setSelected(null)}>
+                                <X size={14} /> Close
+                            </button>
                         </div>
                         <div style={{ display: 'flex', gap: 16, marginBottom: 16, flexWrap: 'wrap' }}>
                             <div>
@@ -67,9 +73,9 @@ export default function ReportsPage() {
                 {/* Reports List */}
                 <div className="card">
                     <div className="card-header"><h3>All Reports</h3></div>
-                    {loading ? <div className="spinner" /> : reports.length === 0 ? (
+                    {loading ? <ShimmerTable rows={5} cols={5} /> : reports.length === 0 ? (
                         <div className="empty-state">
-                            <div className="empty-icon">📝</div>
+                            <div className="empty-icon"><FileText size={48} style={{ color: 'var(--text-muted)' }} /></div>
                             <h3>No incident reports yet</h3>
                             <p>Generate reports from the Log Analysis page</p>
                         </div>
@@ -96,7 +102,9 @@ export default function ReportsPage() {
                                         </td>
                                         <td>{r.generatedBy?.fullName || '—'}</td>
                                         <td>
-                                            <button className="btn btn-primary btn-sm" onClick={() => viewReport(r._id)}>👁️ View</button>
+                                            <button className="btn btn-primary btn-sm" onClick={() => viewReport(r._id)}>
+                                                <Eye size={14} /> View
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}

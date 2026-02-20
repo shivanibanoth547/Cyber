@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Sidebar from '../components/Sidebar';
+import { ShimmerStatGrid, ShimmerTable } from '../components/ShimmerLoader';
+import { Search, FileText, ShieldCheck, Activity } from 'lucide-react';
 import api from '../services/api';
 
 export default function DashboardPage() {
@@ -43,38 +45,50 @@ export default function DashboardPage() {
                     </span>
                 </div>
 
-                <div className="stats-grid">
-                    <div className="stat-card">
-                        <div className="stat-icon">🔍</div>
-                        <div className="stat-value">{stats.analyses}</div>
-                        <div className="stat-label">Total Analyses</div>
+                {loading ? (
+                    <ShimmerStatGrid count={4} />
+                ) : (
+                    <div className="stats-grid">
+                        <div className="stat-card">
+                            <div className="stat-icon-box blue">
+                                <Search size={22} />
+                            </div>
+                            <div className="stat-value">{stats.analyses}</div>
+                            <div className="stat-label">Total Analyses</div>
+                        </div>
+                        <div className="stat-card">
+                            <div className="stat-icon-box purple">
+                                <FileText size={22} />
+                            </div>
+                            <div className="stat-value">{stats.reports}</div>
+                            <div className="stat-label">Incident Reports</div>
+                        </div>
+                        <div className="stat-card">
+                            <div className="stat-icon-box amber">
+                                <ShieldCheck size={22} />
+                            </div>
+                            <div className="stat-value">{user?.role?.replace('_', ' ').toUpperCase()}</div>
+                            <div className="stat-label">Your Role</div>
+                        </div>
+                        <div className="stat-card">
+                            <div className="stat-icon-box green">
+                                <Activity size={22} />
+                            </div>
+                            <div className="stat-value" style={{ color: 'var(--accent-green)' }}>Active</div>
+                            <div className="stat-label">Account Status</div>
+                        </div>
                     </div>
-                    <div className="stat-card">
-                        <div className="stat-icon">📝</div>
-                        <div className="stat-value">{stats.reports}</div>
-                        <div className="stat-label">Incident Reports</div>
-                    </div>
-                    <div className="stat-card">
-                        <div className="stat-icon">🛡️</div>
-                        <div className="stat-value">{user?.role?.replace('_', ' ').toUpperCase()}</div>
-                        <div className="stat-label">Your Role</div>
-                    </div>
-                    <div className="stat-card">
-                        <div className="stat-icon">✅</div>
-                        <div className="stat-value" style={{ color: 'var(--accent-green)' }}>Active</div>
-                        <div className="stat-label">Account Status</div>
-                    </div>
-                </div>
+                )}
 
                 <div className="card">
                     <div className="card-header">
                         <h3>Recent Analyses</h3>
                     </div>
                     {loading ? (
-                        <div className="spinner" />
+                        <ShimmerTable rows={5} cols={4} />
                     ) : recentAnalyses.length === 0 ? (
                         <div className="empty-state">
-                            <div className="empty-icon">📊</div>
+                            <div className="empty-icon"><Search size={48} style={{ color: 'var(--text-muted)' }} /></div>
                             <h3>No analyses yet</h3>
                             <p>Upload security logs to start AI-powered threat analysis</p>
                         </div>

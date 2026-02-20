@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
+import { ShimmerTable } from '../components/ShimmerLoader';
+import { Clock, Users, ClipboardList, Check, XCircle, Ban } from 'lucide-react';
 import api from '../services/api';
 
 export default function AdminDashboard() {
@@ -93,22 +95,31 @@ export default function AdminDashboard() {
 
                 <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
                     <button className={`btn ${tab === 'pending' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setTab('pending')}>
-                        ⏳ Pending Users
+                        <Clock size={16} /> Pending Users
                     </button>
                     <button className={`btn ${tab === 'all' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setTab('all')}>
-                        👥 All Users
+                        <Users size={16} /> All Users
                     </button>
                     <button className={`btn ${tab === 'audit' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setTab('audit')}>
-                        📋 Audit Logs
+                        <ClipboardList size={16} /> Audit Logs
                     </button>
                 </div>
 
-                {loading ? <div className="spinner" /> : (
+                {loading ? (
+                    <div className="card">
+                        <ShimmerTable rows={6} cols={6} />
+                    </div>
+                ) : (
                     <div className="card">
                         {(tab === 'pending' || tab === 'all') && (
                             users.length === 0 ? (
                                 <div className="empty-state">
-                                    <div className="empty-icon">{tab === 'pending' ? '✅' : '👥'}</div>
+                                    <div className="empty-icon">
+                                        {tab === 'pending'
+                                            ? <Check size={48} style={{ color: 'var(--accent-green)' }} />
+                                            : <Users size={48} style={{ color: 'var(--text-muted)' }} />
+                                        }
+                                    </div>
                                     <h3>{tab === 'pending' ? 'No pending users' : 'No users found'}</h3>
                                 </div>
                             ) : (
@@ -147,12 +158,18 @@ export default function AdminDashboard() {
                                                     <div className="action-buttons">
                                                         {u.status === 'pending' && (
                                                             <>
-                                                                <button className="btn btn-success btn-sm" onClick={() => handleAction('approve', u._id)}>✅ Approve</button>
-                                                                <button className="btn btn-danger btn-sm" onClick={() => handleAction('reject', u._id)}>❌ Reject</button>
+                                                                <button className="btn btn-success btn-sm" onClick={() => handleAction('approve', u._id)}>
+                                                                    <Check size={14} /> Approve
+                                                                </button>
+                                                                <button className="btn btn-danger btn-sm" onClick={() => handleAction('reject', u._id)}>
+                                                                    <XCircle size={14} /> Reject
+                                                                </button>
                                                             </>
                                                         )}
                                                         {u.status === 'approved' && (
-                                                            <button className="btn btn-danger btn-sm" onClick={() => handleAction('disable', u._id)}>🚫 Disable</button>
+                                                            <button className="btn btn-danger btn-sm" onClick={() => handleAction('disable', u._id)}>
+                                                                <Ban size={14} /> Disable
+                                                            </button>
                                                         )}
                                                     </div>
                                                 </td>
@@ -165,7 +182,7 @@ export default function AdminDashboard() {
                         {tab === 'audit' && (
                             auditLogs.length === 0 ? (
                                 <div className="empty-state">
-                                    <div className="empty-icon">📋</div>
+                                    <div className="empty-icon"><ClipboardList size={48} style={{ color: 'var(--text-muted)' }} /></div>
                                     <h3>No audit logs yet</h3>
                                 </div>
                             ) : (

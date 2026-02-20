@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Shield, Upload, Send } from 'lucide-react';
 
 export default function RegisterPage() {
     const [formData, setFormData] = useState({ fullName: '', email: '', password: '', confirmPassword: '' });
@@ -51,7 +52,12 @@ export default function RegisterPage() {
     return (
         <div className="auth-container">
             <div className="auth-card" style={{ maxWidth: 520 }}>
-                <h1>🛡️ Request Access</h1>
+                <div className="auth-logo">
+                    <div className="logo-icon">
+                        <Shield size={28} color="#fff" />
+                    </div>
+                </div>
+                <h1>Request Access</h1>
                 <p className="subtitle">Submit your details for SOC platform access</p>
 
                 {error && <div className="alert alert-error">{error}</div>}
@@ -83,15 +89,19 @@ export default function RegisterPage() {
                             onDragLeave={() => setDragOver(false)}
                             onClick={() => document.getElementById('idDocInput').click()}
                         >
-                            <div className="upload-icon">📄</div>
+                            <Upload size={40} style={{ color: 'var(--text-muted)', marginBottom: 12 }} />
                             <p>Drag & drop your ID document here or click to browse</p>
-                            <p style={{ fontSize: 12, marginTop: 4 }}>PDF, JPG, PNG — Max 10MB</p>
+                            <p style={{ fontSize: 12, marginTop: 4, color: 'var(--text-muted)' }}>PDF, JPG, PNG — Max 10MB</p>
                             {file && <div className="file-name">✅ {file.name}</div>}
                             <input id="idDocInput" type="file" accept=".pdf,.jpg,.jpeg,.png" style={{ display: 'none' }} onChange={(e) => setFile(e.target.files[0])} />
                         </div>
                     </div>
                     <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
-                        {loading ? 'Submitting...' : '📨 Submit Registration'}
+                        {loading ? (
+                            <>Submitting...</>
+                        ) : (
+                            <><Send size={16} /> Submit Registration</>
+                        )}
                     </button>
                 </form>
 
