@@ -7,10 +7,23 @@ const { createAuditEntry } = require("../middleware/audit.middleware");
  * Analyze a log text using the AI engine and store results.
  */
 async function analyzeLogContent({ logText, originalFilename, userId, ipAddress }) {
-    const logContentHash = hashString(logText);
-
     // Invoke AI engine
     const aiResult = await analyzeLog(logText);
+
+    // Conversational responses don't get saved to DB
+    if (aiResult.isConversational) {
+        return {
+            _id: null,
+            threatSummary: aiResult.threatSummary,
+            severity: aiResult.severity,
+            mitreTechnique: aiResult.mitreTechnique,
+            recommendedActions: aiResult.recommendedActions,
+            rawAiResponse: aiResult.rawResponse,
+            isConversational: true,
+        };
+    }
+
+    const logContentHash = hashString(logText);
 
     const analysis = await LogAnalysis.create({
         userId,

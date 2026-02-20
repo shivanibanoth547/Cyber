@@ -142,7 +142,7 @@ export default function ForensicChat({ onAnalysisComplete }) {
                             {msg.role === 'user' ? <User size={18} /> : <Bot size={18} />}
                         </div>
                         <div className="chat-bubble">
-                            {msg.role === 'ai' && msg.analysis ? (
+                            {msg.role === 'ai' && msg.analysis && !msg.analysis.isConversational ? (
                                 <>
                                     <div style={{ marginBottom: 12 }}>Threat analysis complete.</div>
                                     <div className="ai-result-card">
@@ -152,24 +152,32 @@ export default function ForensicChat({ onAnalysisComplete }) {
                                                 {msg.analysis.severity}
                                             </span>
                                         </div>
-                                        <div className="result-row">
-                                            <span className="result-label">MITRE ATT&CK</span>
-                                            <span style={{ color: 'var(--accent-amber)' }}>{msg.analysis.mitreTechnique}</span>
-                                        </div>
+                                        {msg.analysis.mitreTechnique && (
+                                            <div className="result-row">
+                                                <span className="result-label">MITRE ATT&CK</span>
+                                                <span style={{ color: 'var(--accent-amber)' }}>{msg.analysis.mitreTechnique}</span>
+                                            </div>
+                                        )}
                                         <div className="result-row">
                                             <span className="result-label">Threat Summary</span>
                                             <span>{msg.analysis.threatSummary}</span>
                                         </div>
-                                        <div className="result-row">
-                                            <span className="result-label">Recommended Actions</span>
-                                            <ul style={{ paddingLeft: 16, margin: '4px 0 0' }}>
-                                                {msg.analysis.recommendedActions?.map((a, i) => (
-                                                    <li key={i} style={{ fontSize: 13, marginBottom: 4 }}>{a}</li>
-                                                ))}
-                                            </ul>
-                                        </div>
+                                        {msg.analysis.recommendedActions && msg.analysis.recommendedActions.length > 0 && (
+                                            <div className="result-row">
+                                                <span className="result-label">Recommended Actions</span>
+                                                <ul style={{ paddingLeft: 16, margin: '4px 0 0' }}>
+                                                    {msg.analysis.recommendedActions.map((a, i) => (
+                                                        <li key={i} style={{ fontSize: 13, marginBottom: 4 }}>{a}</li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
                                     </div>
                                 </>
+                            ) : msg.role === 'ai' && msg.analysis?.isConversational ? (
+                                <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+                                    {msg.analysis.threatSummary}
+                                </div>
                             ) : (
                                 <div style={{ whiteSpace: 'pre-wrap' }}>{msg.content}</div>
                             )}
